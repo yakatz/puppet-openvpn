@@ -143,7 +143,7 @@ set_var EASYRSA_ALGO <%= $ssl_key_algo %>
 
 # Define the named curve, used in ec & ed modes:
 #
-<% if $ssl_key_curve { -%>
+<% if $ssl_key_curve and $ssl_key_algo in ['ec', 'ed'] { -%>
 set_var EASYRSA_CURVE <%= $ssl_key_curve %>
 <% } -%>
 
