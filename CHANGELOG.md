@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
-## [v12.0.0](https://github.com/voxpupuli/puppet-openvpn/tree/v12.0.0) (2026-02-02)
+## [v12.0.0](https://github.com/voxpupuli/puppet-openvpn/tree/v12.0.0) (2026-02-19)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-openvpn/compare/v11.0.1...v12.0.0)
 
@@ -16,11 +16,13 @@ These should not affect the functionality of the module.
 
 **Implemented enhancements:**
 
+- Add support for Debian 13 [\#499](https://github.com/voxpupuli/puppet-openvpn/pull/499) ([Valantin](https://github.com/Valantin))
 - Add support for FreeBSD 15 [\#492](https://github.com/voxpupuli/puppet-openvpn/pull/492) ([smortex](https://github.com/smortex))
 - server: Support multiple "local" options [\#483](https://github.com/voxpupuli/puppet-openvpn/pull/483) ([flichtenheld](https://github.com/flichtenheld))
 
 **Fixed bugs:**
 
+- Ensure EasyRSA certificates can be properly revoked [\#500](https://github.com/voxpupuli/puppet-openvpn/pull/500) ([yakatz](https://github.com/yakatz))
 - Fix missing package in archlinux acceptance tests [\#496](https://github.com/voxpupuli/puppet-openvpn/pull/496) ([yakatz](https://github.com/yakatz))
 - Fix requires for crl\_auto\_renew [\#495](https://github.com/voxpupuli/puppet-openvpn/pull/495) ([bwitt](https://github.com/bwitt))
 
