@@ -16,7 +16,7 @@
 * [`openvpn::ca`](#openvpn--ca): This define creates the openvpn ca and ssl certificates
 * [`openvpn::client`](#openvpn--client): This define creates client certs for a specified server as well as a tarball that can be directly imported into clients
 * [`openvpn::client_specific_config`](#openvpn--client_specific_config): This feature is explained here: http://openvpn.net/index.php/open-source/documentation/howto.html#policy All the parameters are explained in 
-* [`openvpn::revoke`](#openvpn--revoke): This define creates a revocation on a certificate for a specified server.
+* [`openvpn::revoke`](#openvpn--revoke): This define creates a revocation on a certificate for a specified server. There may not be an openvpn::client resource with the same name.
 * [`openvpn::server`](#openvpn--server): This define creates the openvpn server instance which can run in server or client mode.
 
 ## Classes
@@ -875,7 +875,7 @@ Default value: `true`
 
 ### <a name="openvpn--revoke"></a>`openvpn::revoke`
 
-This define creates a revocation on a certificate for a specified server.
+This define creates a revocation on a certificate for a specified server. There may not be an openvpn::client resource with the same name.
 
 #### Examples
 
@@ -901,7 +901,16 @@ openvpn::revoke {
 
 The following parameters are available in the `openvpn::revoke` defined type:
 
+* [`ensure`](#-openvpn--revoke--ensure)
 * [`server`](#-openvpn--revoke--server)
+
+##### <a name="-openvpn--revoke--ensure"></a>`ensure`
+
+Data type: `Enum['present', 'absent']`
+
+Revoke certificate or allow certificate to be reissued
+
+Default value: `present`
 
 ##### <a name="-openvpn--revoke--server"></a>`server`
 

@@ -83,6 +83,10 @@ define openvpn::client (
     warning('Using $pam is deprecated. Use $authuserpass instead!')
   }
 
+  if defined(Openvpn::Revoke[$name]) {
+    fail("Can't create an Openvpn::Client configuration for client '${name}' while there is an Openvpn::Revoke configuration.")
+  }
+
   Openvpn::Server[$server]
   -> Openvpn::Client[$name]
 
@@ -95,6 +99,11 @@ define openvpn::client (
   -> Openvpn::Client[$name]
 
   $server_directory = $openvpn::server_directory
+
+  # If this certificate was previously revoked, remove that file.
+  file { "${server_directory}/${server}/easy-rsa/revoked/${name}":
+    ensure => absent,
+  }
 
   if $expire {
     if is_integer($expire) {

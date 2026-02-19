@@ -1,6 +1,7 @@
 #
-# @summary This define creates a revocation on a certificate for a specified server.
+# @summary This define creates a revocation on a certificate for a specified server. There may not be an openvpn::client resource with the same name.
 #
+# @param ensure Revoke certificate or allow certificate to be reissued
 # @param server Name of the corresponding openvpn endpoint
 # @example
 #   openvpn::client {
@@ -15,11 +16,13 @@
 #
 define openvpn::revoke (
   String $server,
+  Enum['present', 'absent'] $ensure = present,
 ) {
-  Openvpn::Server[$server]
-  -> Openvpn::Revoke[$name]
+  if defined(Openvpn::Client[$name]) and $ensure == 'present' {
+    fail("Can't revoke certificate for client '${name}' while there is still an Openvpn::Client configuration.")
+  }
 
-  Openvpn::Client[$name]
+  Openvpn::Server[$server]
   -> Openvpn::Revoke[$name]
 
   $server_directory = $openvpn::server_directory
@@ -34,32 +37,38 @@ define openvpn::revoke (
     default => fail("unexepected value for EasyRSA version, got '${openvpn::easyrsa_version}', expect 3.0."),
   }
 
-  file { "${server_directory}/${server}/easy-rsa/revoked/${name}":
-    ensure  => file,
-    require => Exec["revoke certificate for ${name} in context of ${server}"],
-  }
+  if $ensure == 'absent' {
+    file { "${server_directory}/${server}/easy-rsa/revoked/${name}":
+      ensure => absent,
+    }
+  } else {
+    file { "${server_directory}/${server}/easy-rsa/revoked/${name}":
+      ensure  => file,
+      require => Exec["revoke certificate for ${name} in context of ${server}"],
+    }
 
-  exec { "revoke certificate for ${name} in context of ${server}":
-    command  => $revocation_command,
-    cwd      => "${server_directory}/${server}/easy-rsa",
-    provider => 'shell',
-    notify   => Exec["renew crl.pem on ${server} because of revocation of ${name}"],
-    creates  => "${server_directory}/${server}/easy-rsa/revoked/${name}",
-  }
+    exec { "revoke certificate for ${name} in context of ${server}":
+      command  => $revocation_command,
+      cwd      => "${server_directory}/${server}/easy-rsa",
+      provider => 'shell',
+      notify   => Exec["renew crl.pem on ${server} because of revocation of ${name}"],
+      creates  => "${server_directory}/${server}/easy-rsa/revoked/${name}",
+    }
 
-  exec { "renew crl.pem on ${server} because of revocation of ${name}":
-    command     => $renew_command,
-    cwd         => "${server_directory}/${server}/easy-rsa",
-    provider    => 'shell',
-    refreshonly => true,
-  }
-
-  if ($openvpn::easyrsa_version == '3.0') {
-    exec { "copy renewed crl.pem to ${server} keys directory because of revocation of ${name}":
-      command     => "cp ${server_directory}/${server}/easy-rsa/keys/crl.pem ${server_directory}/${server}/crl.pem",
-      subscribe   => Exec["renew crl.pem on ${server} because of revocation of ${name}"],
+    exec { "renew crl.pem on ${server} because of revocation of ${name}":
+      command     => $renew_command,
+      cwd         => "${server_directory}/${server}/easy-rsa",
       provider    => 'shell',
       refreshonly => true,
+    }
+
+    if ($openvpn::easyrsa_version == '3.0') {
+      exec { "copy renewed crl.pem to ${server} keys directory because of revocation of ${name}":
+        command     => "cp ${server_directory}/${server}/easy-rsa/keys/crl.pem ${server_directory}/${server}/crl.pem",
+        subscribe   => Exec["renew crl.pem on ${server} because of revocation of ${name}"],
+        provider    => 'shell',
+        refreshonly => true,
+      }
     }
   }
 }
