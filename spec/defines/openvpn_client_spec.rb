@@ -93,6 +93,11 @@ describe 'openvpn::client' do
             'target' => "#{server_directory}/test_server/easy-rsa/keys/ca.crt"
           )
         }
+
+        it {
+          is_expected.to contain_file("#{server_directory}/test_server/easy-rsa/revoked/test_client").
+            with_ensure('absent')
+        }
       end
 
       context 'with remote_host' do

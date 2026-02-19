@@ -30,9 +30,6 @@ describe 'openvpn::revoke' do
             city          => "Some City",
             organization  => "example.org",
             email         => "testemail@example.org"
-          }',
-            'openvpn::client { "test_client":
-            server => "test_server"
           }'
           ].join
         end
@@ -60,6 +57,30 @@ describe 'openvpn::revoke' do
           is_expected.to contain_exec('copy renewed crl.pem to test_server keys directory because of revocation of test_client').
             with_command("cp #{server_directory}/test_server/easy-rsa/keys/crl.pem #{server_directory}/test_server/crl.pem")
         }
+
+        context 'with conflicting client' do
+          let(:pre_condition) do
+            [
+              'openvpn::client { "test_client":
+              server => "test_server"
+             }'
+            ].join
+          end
+
+          it {
+            is_expected.to compile.and_raise_error(%r{Can't create an Openvpn::Client configuration for client 'test_client' while there is an Openvpn::Revoke configuration.})
+          }
+        end
+
+        context 'remove revocation' do
+          let(:title) { 'test_client' }
+          let(:params) { { 'ensure' => 'absent', 'server' => 'test_server' } }
+
+          it {
+            is_expected.to contain_file("#{server_directory}/test_server/easy-rsa/revoked/test_client").
+              with_ensure('absent')
+          }
+        end
       end
     end
   end

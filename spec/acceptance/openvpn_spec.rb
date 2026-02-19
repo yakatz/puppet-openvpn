@@ -93,7 +93,7 @@ describe 'openvpn', order: :defined do
             email        => 'bar@foo.org',
             server       => '10.0.0.0 255.255.255.0',
           }
-          openvpn::client { ['vpnclienta','vpnclientb'] :
+          openvpn::client { ['vpnclienta'] :
             server      => 'test_openvpn_server',
             require     => Openvpn::Server['test_openvpn_server'],
           }

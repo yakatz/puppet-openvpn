@@ -69,7 +69,7 @@ openvpn::client_specific_configs:
     server: 'winterthur'
     ifconfig: '10.200.200.50 10.200.200.51'
 
-openvpn::revokes:
+openvpn::revoke:
   'client3':
     server: 'winterthur'
 ```
